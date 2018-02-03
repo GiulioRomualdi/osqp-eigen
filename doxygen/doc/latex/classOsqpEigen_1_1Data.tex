@@ -1,0 +1,300 @@
+\section{Osqp\+Eigen\+:\+:Data Class Reference}
+\label{classOsqpEigen_1_1Data}\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+
+
+\hyperlink{classOsqpEigen_1_1Data}{Data} class is a wrapper of the O\+S\+QP O\+S\+Q\+P\+Data struct.  
+
+
+
+
+{\ttfamily \#include $<$Data.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classOsqpEigen_1_1Data_a3273d3a0bc715ebf8ec761de53b8c609}{Data} ()\label{classOsqpEigen_1_1Data_a3273d3a0bc715ebf8ec761de53b8c609}
+
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classOsqpEigen_1_1Data_abc922eb476cd94d8cff33b41aa540132}{Data} (int n, int m)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classOsqpEigen_1_1Data_a470e51411686dc0c57ded9db7e67e9f7}{$\sim$\+Data} ()\label{classOsqpEigen_1_1Data_a470e51411686dc0c57ded9db7e67e9f7}
+
+\begin{DoxyCompactList}\small\item\em Deconstructor. \end{DoxyCompactList}\item 
+void \hyperlink{classOsqpEigen_1_1Data_ab66614fe057c238c53b3efcd546c96c0}{clear\+Hessian\+Matrix} ()\label{classOsqpEigen_1_1Data_ab66614fe057c238c53b3efcd546c96c0}
+
+\begin{DoxyCompactList}\small\item\em Clear the hessian matrix. \end{DoxyCompactList}\item 
+void \hyperlink{classOsqpEigen_1_1Data_a93b0b00a90c6fafd4fb8a23cb8553a0f}{clear\+Linear\+Constraints\+Matrix} ()\label{classOsqpEigen_1_1Data_a93b0b00a90c6fafd4fb8a23cb8553a0f}
+
+\begin{DoxyCompactList}\small\item\em Clear the linear constraints matrix. \end{DoxyCompactList}\item 
+void \hyperlink{classOsqpEigen_1_1Data_abd09d8d70fcbaa8db833b87ca0bcbbab}{set\+Number\+Of\+Variables} (int n)
+\begin{DoxyCompactList}\small\item\em Set the number of variables. \end{DoxyCompactList}\item 
+void \hyperlink{classOsqpEigen_1_1Data_aea746479660e90e46fbf185dca91d936}{set\+Number\+Of\+Constraints} (int m)
+\begin{DoxyCompactList}\small\item\em Set the number of constraints. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{classOsqpEigen_1_1Data_a58dfe4bfbb1b843736496eea9d0acfb7}{set\+Hessian\+Matrix} (const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&hessian\+Matrix)
+\begin{DoxyCompactList}\small\item\em Set the quadratic part of the cost function (Hessian). \end{DoxyCompactList}\item 
+{\footnotesize template$<$int n$>$ }\\bool \hyperlink{classOsqpEigen_1_1Data_a46b476556b8f71326c6827285f10b970}{set\+Gradient} (Eigen\+::\+Matrix$<$ c\+\_\+float, n, 1 $>$ \&gradient\+Vector)
+\begin{DoxyCompactList}\small\item\em Set the linear part of the cost function (Gradient). \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{classOsqpEigen_1_1Data_a202b1b554cad83590bf9999b1ffdf6c5}{set\+Linear\+Constraints\+Matrix} (const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&linear\+Constraints\+Matrix)
+\begin{DoxyCompactList}\small\item\em Set the linear constraint matrix A (size m x n) \end{DoxyCompactList}\item 
+{\footnotesize template$<$int m$>$ }\\bool \hyperlink{classOsqpEigen_1_1Data_a2309f26732b40ef31a639ab8d0478e18}{set\+Lower\+Bound} (Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&lower\+Bound\+Vector)
+\begin{DoxyCompactList}\small\item\em Set the array for lower bound (size m). \end{DoxyCompactList}\item 
+{\footnotesize template$<$int m$>$ }\\bool \hyperlink{classOsqpEigen_1_1Data_a0c8a933f59793f4ecb92f6b04917d3ac}{set\+Upper\+Bound} (Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&upper\+Bound\+Vector)
+\begin{DoxyCompactList}\small\item\em Set the array for upper bound (size m). \end{DoxyCompactList}\item 
+O\+S\+Q\+P\+Data $\ast$const \& \hyperlink{classOsqpEigen_1_1Data_ab80cf6c92840d8e13fc1f182309d31a3}{get\+Data} () const 
+\begin{DoxyCompactList}\small\item\em Get the O\+S\+Q\+P\+Data struct. \end{DoxyCompactList}\item 
+bool \hyperlink{classOsqpEigen_1_1Data_a131f45b73d24150ff53ba3173e8923cd}{is\+Set} () const 
+\begin{DoxyCompactList}\small\item\em Verify if all the matrix and vectors are already set. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classOsqpEigen_1_1Data}{Data} class is a wrapper of the O\+S\+QP O\+S\+Q\+P\+Data struct. 
+
+Definition at line 28 of file Data.\+hpp.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!Data@{Data}}
+\index{Data@{Data}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{Data(int n, int m)}{Data(int n, int m)}}]{\setlength{\rightskip}{0pt plus 5cm}Osqp\+Eigen\+::\+Data\+::\+Data (
+\begin{DoxyParamCaption}
+\item[{int}]{n, }
+\item[{int}]{m}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_abc922eb476cd94d8cff33b41aa540132}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & is the number of variables; \\
+\hline
+{\em m} & is the number of constraints. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 28 of file Data.\+cpp.
+
+
+
+References set\+Number\+Of\+Constraints(), and set\+Number\+Of\+Variables().
+
+
+
+\subsection{Member Function Documentation}
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!get\+Data@{get\+Data}}
+\index{get\+Data@{get\+Data}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{get\+Data() const }{getData() const }}]{\setlength{\rightskip}{0pt plus 5cm}O\+S\+Q\+P\+Data $\ast$const \& Osqp\+Eigen\+::\+Data\+::get\+Data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classOsqpEigen_1_1Data_ab80cf6c92840d8e13fc1f182309d31a3}
+
+
+Get the O\+S\+Q\+P\+Data struct. 
+
+\begin{DoxyReturn}{Returns}
+a const point to the O\+S\+Q\+P\+Data struct. 
+\end{DoxyReturn}
+
+
+Definition at line 82 of file Data.\+cpp.
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!is\+Set@{is\+Set}}
+\index{is\+Set@{is\+Set}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{is\+Set() const }{isSet() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool Osqp\+Eigen\+::\+Data\+::is\+Set (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classOsqpEigen_1_1Data_a131f45b73d24150ff53ba3173e8923cd}
+
+
+Verify if all the matrix and vectors are already set. 
+
+\begin{DoxyReturn}{Returns}
+true if all the O\+S\+Q\+P\+Data struct are set. 
+\end{DoxyReturn}
+
+
+Definition at line 87 of file Data.\+cpp.
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Gradient@{set\+Gradient}}
+\index{set\+Gradient@{set\+Gradient}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Gradient(\+Eigen\+::\+Matrix$<$ c\+\_\+float, n, 1 $>$ \&gradient\+Vector)}{setGradient(Eigen::Matrix< c_float, n, 1 > &gradientVector)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$int n$>$ bool Osqp\+Eigen\+::\+Data\+::set\+Gradient (
+\begin{DoxyParamCaption}
+\item[{Eigen\+::\+Matrix$<$ c\+\_\+float, n, 1 $>$ \&}]{gradient\+Vector}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_a46b476556b8f71326c6827285f10b970}
+
+
+Set the linear part of the cost function (Gradient). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gradient\+Vector} & is the Gradient vector. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false in case of success/failure. 
+\end{DoxyReturn}
+
+
+Definition at line 45 of file Data.\+tpp.
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Hessian\+Matrix@{set\+Hessian\+Matrix}}
+\index{set\+Hessian\+Matrix@{set\+Hessian\+Matrix}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Hessian\+Matrix(const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&hessian\+Matrix)}{setHessianMatrix(const Eigen::SparseMatrix< T > &hessianMatrix)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ bool Osqp\+Eigen\+::\+Data\+::set\+Hessian\+Matrix (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&}]{hessian\+Matrix}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_a58dfe4bfbb1b843736496eea9d0acfb7}
+
+
+Set the quadratic part of the cost function (Hessian). 
+
+It is assumed to be a simmetric matrix. 
+\begin{DoxyParams}{Parameters}
+{\em hessian\+Matrix} & is the Hessian matrix. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false in case of success/failure. 
+\end{DoxyReturn}
+
+
+Definition at line 11 of file Data.\+tpp.
+
+
+
+References Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::create\+Osqp\+Sparse\+Matrix().
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Linear\+Constraints\+Matrix@{set\+Linear\+Constraints\+Matrix}}
+\index{set\+Linear\+Constraints\+Matrix@{set\+Linear\+Constraints\+Matrix}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Linear\+Constraints\+Matrix(const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&linear\+Constraints\+Matrix)}{setLinearConstraintsMatrix(const Eigen::SparseMatrix< T > &linearConstraintsMatrix)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ bool Osqp\+Eigen\+::\+Data\+::set\+Linear\+Constraints\+Matrix (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&}]{linear\+Constraints\+Matrix}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_a202b1b554cad83590bf9999b1ffdf6c5}
+
+
+Set the linear constraint matrix A (size m x n) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em linear\+Constraints\+Matrix} & is the linear constraints matrix A. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false in case of success/failure. 
+\end{DoxyReturn}
+
+
+Definition at line 58 of file Data.\+tpp.
+
+
+
+References Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::create\+Osqp\+Sparse\+Matrix().
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Lower\+Bound@{set\+Lower\+Bound}}
+\index{set\+Lower\+Bound@{set\+Lower\+Bound}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Lower\+Bound(\+Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&lower\+Bound\+Vector)}{setLowerBound(Eigen::Matrix< c_float, m, 1 > &lowerBoundVector)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$int m$>$ bool Osqp\+Eigen\+::\+Data\+::set\+Lower\+Bound (
+\begin{DoxyParamCaption}
+\item[{Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&}]{lower\+Bound\+Vector}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_a2309f26732b40ef31a639ab8d0478e18}
+
+
+Set the array for lower bound (size m). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em lower\+Bound\+Vector} & is the lower bound constraint. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false in case of success/failure. 
+\end{DoxyReturn}
+
+
+Definition at line 99 of file Data.\+tpp.
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Number\+Of\+Constraints@{set\+Number\+Of\+Constraints}}
+\index{set\+Number\+Of\+Constraints@{set\+Number\+Of\+Constraints}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Number\+Of\+Constraints(int m)}{setNumberOfConstraints(int m)}}]{\setlength{\rightskip}{0pt plus 5cm}void Osqp\+Eigen\+::\+Data\+::set\+Number\+Of\+Constraints (
+\begin{DoxyParamCaption}
+\item[{int}]{m}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_aea746479660e90e46fbf185dca91d936}
+
+
+Set the number of constraints. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em m} & is the number of constraints. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 76 of file Data.\+cpp.
+
+
+
+Referenced by Data().
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Number\+Of\+Variables@{set\+Number\+Of\+Variables}}
+\index{set\+Number\+Of\+Variables@{set\+Number\+Of\+Variables}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Number\+Of\+Variables(int n)}{setNumberOfVariables(int n)}}]{\setlength{\rightskip}{0pt plus 5cm}void Osqp\+Eigen\+::\+Data\+::set\+Number\+Of\+Variables (
+\begin{DoxyParamCaption}
+\item[{int}]{n}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_abd09d8d70fcbaa8db833b87ca0bcbbab}
+
+
+Set the number of variables. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & is the number of variables. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 70 of file Data.\+cpp.
+
+
+
+Referenced by Data().
+
+\index{Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}!set\+Upper\+Bound@{set\+Upper\+Bound}}
+\index{set\+Upper\+Bound@{set\+Upper\+Bound}!Osqp\+Eigen\+::\+Data@{Osqp\+Eigen\+::\+Data}}
+\subsubsection[{\texorpdfstring{set\+Upper\+Bound(\+Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&upper\+Bound\+Vector)}{setUpperBound(Eigen::Matrix< c_float, m, 1 > &upperBoundVector)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$int m$>$ bool Osqp\+Eigen\+::\+Data\+::set\+Upper\+Bound (
+\begin{DoxyParamCaption}
+\item[{Eigen\+::\+Matrix$<$ c\+\_\+float, m, 1 $>$ \&}]{upper\+Bound\+Vector}
+\end{DoxyParamCaption}
+)}\label{classOsqpEigen_1_1Data_a0c8a933f59793f4ecb92f6b04917d3ac}
+
+
+Set the array for upper bound (size m). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em upper\+Bound\+Vector} & is the upper bound constraint. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false in case of success/failure. 
+\end{DoxyReturn}
+
+
+Definition at line 112 of file Data.\+tpp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Data_8hpp}{Data.\+hpp}\item 
+\hyperlink{Data_8cpp}{Data.\+cpp}\item 
+\hyperlink{Data_8tpp}{Data.\+tpp}\end{DoxyCompactItemize}

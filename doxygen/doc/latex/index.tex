@@ -1,0 +1,405 @@
+A simple C++ Eigen wrapper for \href{http://osqp.readthedocs.io/en/latest/}{\tt {\bfseries osqp library}}. \begin{DoxyAuthor}{Author}
+Giulio Romualdi \href{mailto:giulio.romualdi@iit.it}{\tt giulio.\+romualdi@iit.\+it} ~\newline
+ 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+License terms, released under the terms of the G\+NU L\+G\+PL v3.\+0.
+\end{DoxyCopyright}
+\hypertarget{index_build-section}{}\section{How to build the wrapper}\label{index_build-section}
+Please run the following command in your terminal 
+\begin{DoxyCode}
+1 git clone https://github.com/robotology/osqp-eigen.git
+2 cd osqp-eigen
+3 mkdir build && cd build
+4 cmake ../
+5 make
+6 [sudo] make install
+\end{DoxyCode}
+
+
+\begin{DoxyNote}{Note}
+{\ttfamily sudo} is not necessary if you specify the {\ttfamily C\+M\+A\+K\+E\+\_\+\+I\+N\+S\+T\+A\+L\+L\+\_\+\+P\+R\+E\+F\+IX}. In this case it is necessary to add in the {\ttfamily .bashrc} the following lines\+: 
+\begin{DoxyCode}
+1 export OsqpEigen\_DIR=/path/where/you/installed/
+\end{DoxyCode}
+
+\end{DoxyNote}
+\hypertarget{index_use-section}{}\section{How to embed the wrapper inside your project}\label{index_use-section}
+osqp-\/eigen provides native C\+Make support which allows the library to be easily used in C\+Make projects. \begin{DoxyNote}{Note}
+C\+Make 3.\+0 (or later) is required to enable this functionality.
+\end{DoxyNote}
+osqp-\/eigen exports a C\+Make target called {\ttfamily Osqp\+Eigen\+::\+Osqp\+Eigen} which can be imported using the {\ttfamily find\+\_\+package} C\+Make command and used by calling {\ttfamily target\+\_\+link\+\_\+libraries} as fllows\+: 
+\begin{DoxyCode}
+1 cmake\_minimum\_required(VERSION 3.0)
+2 find\_package(OsqpEigen REQUIRED)
+3 add\_executable(myproject src/main.cpp)
+4 target\_link\_libraries(myproject OsqpEigen::OsqpEigen osqp::osqp Eigen3::Eigen)
+\end{DoxyCode}
+ Eigen and osqp libraries are required by the wrapper.\hypertarget{index_example-section}{}\section{How to implement an M\+P\+C controller with osqp-\/eigen}\label{index_example-section}
+In this section a simple implementation of a M\+PC controller using osqp-\/eigen is shown. \href{http://osqp.readthedocs.io/en/latest/examples/mpc.html}{\tt {\bfseries Here}} you can find the original version of this example.
+
+For further details please refer to the \href{https://github.com/GiulioRomualdi/osqp-eigen/blob/master/example/src/MPCExample.cpp}{\tt {\bfseries code}}.\hypertarget{index_MPCPROBLEM}{}\subsection{Problem}\label{index_MPCPROBLEM}
+The problem is to develop a controller that allows a linear system to track a constant reference state $x_r$. This kind of problem can be solved using a lot of different controller architectures, however in order to write a tutorial for osqp-\/eigen library the \href{https://en.wikipedia.org/wiki/Model_predictive_control}{\tt {\bfseries M\+PC}} approach will be chosen. Thus we have to find a controller low $u_0^*$ such that\+: \[ \begin{split}\begin{array}{ll} u_0 ^* = \mbox{arg min}_{x_k, u_k} & (x_N-x_r)^T Q_N (x_N-x_r) + \sum_{k=0}^{N-1} (x_k-x_r)^T Q (x_k-x_r) + u_k^T R u_k \\ \mbox{subject to} & x_{k+1} = A x_k + B u_k \\ & x_{\rm min} \le x_k \le x_{\rm max} \\ & u_{\rm min} \le u_k \le u_{\rm max} \\ & x_0 = \bar{x} \end{array}\end{split} \] where $Q$, $Q_N$ and $R$ are symmetric positive definite matrices; the states $x_k$ and the inputs $u_k$ have to be constrained between some lower and upper bounds and the reference state $x_r$ is \[ x_r = \begin{bmatrix} 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \end{bmatrix} ^T \]\hypertarget{index_MPC2QP}{}\subsection{M\+P\+C to QP}\label{index_MPC2QP}
+First of all the M\+PC problem has to be casted to a standard QP problem. \[ \begin{split}\begin{array}{ll} \mbox{minimize} & \frac{1}{2} x^T P x + q^T x \\ \mbox{subject to} & l \leq A_c x \leq u \end{array}\end{split} \] where the hessian matrix $P$ is equal to \[ P = \text{diag}(Q, Q, ..., Q_N, R, ..., R) \] while the gradient vector is \[ q = \begin{bmatrix} -Q x_r \\ -Q x_r \\ \vdots \\ -Q_N x_r \\ 0\\ \vdots\\ 0 \end{bmatrix} \]
+
+The linear constraint matrix $A_c$ is \[ A_c = \left[ \begin{array}{ccccc|cccc} -I & 0 & 0 & \cdots & 0 & 0 & 0 & \cdots & 0\\ A & -I & 0 & \cdots & 0 & B & 0 & \cdots & 0 \\ 0 & A & -I & \cdots & 0 & 0 & B & \cdots & 0\\ \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & 0 & \cdots & -I & 0 & 0 & \cdots & B\\ \hline I & 0 & 0 & \cdots & 0 & 0 & 0 & \cdots & 0\\ 0 & I & 0 & \cdots & 0 & 0 & 0 & \cdots & 0\\ 0 & 0 & I & \cdots & 0 & 0 & 0 & \cdots & 0\\ \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & 0 & \cdots & I & 0 & 0 & \cdots & 0\\ 0 & 0 & 0 & \cdots & 0 & I & 0 & \cdots & 0\\ 0 & 0 & 0 & \cdots & 0 & 0 & I & \cdots & 0\\ \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & 0 & \cdots & 0 & 0 & 0 & \cdots & I \end{array} \right] \] while the upper and the lower bound are \[ l = \begin{bmatrix} -x_0 \\ 0 \\ \vdots \\ 0 \\ x_{min}\\ \vdots\\ x_{min}\\ u_{min}\\ \vdots\\ u_{min}\\ \end{bmatrix} \quad u = \begin{bmatrix} -x_0 \\ 0 \\ \vdots \\ 0 \\ x_{max}\\ \vdots\\ x_{max}\\ u_{max}\\ \vdots\\ u_{max}\\ \end{bmatrix} \]
+
+Since the osqp-\/eigen handles only QP problem this operation shall be done by the user. You can find the implementation of the following functions \href{https://github.com/GiulioRomualdi/osqp-eigen/blob/master/example/src/MPCExample.cpp#L71-L182}{\tt {\bfseries here}}. 
+\begin{DoxyCode}
+castMPCToQPHessian(Q, R, mpcWindow, hessian);
+castMPCToQPGradient(Q, xRef, mpcWindow, gradient);
+castMPCToQPConstraintMatrix(a, b, mpcWindow, linearMatrix);
+castMPCToQPConstraintVectores(xMax, xMin, uMax, uMin, x0, mpcWindow, lowerBound, upperBound);
+\end{DoxyCode}
+\hypertarget{index_OSQP_init}{}\subsection{Solver initialization}\label{index_OSQP_init}
+Now you are able to use the O\+S\+QP solver. We first create an instance of the solver 
+\begin{DoxyCode}
+\textcolor{comment}{// instantiate the solver}
+OsqpEigen::Solver solver;
+\end{DoxyCode}
+ when the solver is instantiated the \href{http://osqp.readthedocs.io/en/latest/interfaces/solver_settings.html}{\tt {\bfseries default settings}} are automatically loaded, however you can change each setting using the following function 
+\begin{DoxyCode}
+solver.settings()->set<Setting>()
+\end{DoxyCode}
+ where {\ttfamily set$<$\+Setting$>$()} is a setter function. You can find the list of all the setter functions in the {\ttfamily \hyperlink{classOsqpEigen_1_1Settings}{Osqp\+Eigen\+::\+Settings}} class. For example you can use the warm start variables in the optimization problem by calling 
+\begin{DoxyCode}
+solver.settings()->setWarmStart(\textcolor{keyword}{true});
+\end{DoxyCode}
+
+
+Now you can set the data of the optimization problem (number of variables, number of constraints and so on) 
+\begin{DoxyCode}
+solver.initData()->setNumberOfVariables(numberOfVariable);
+solver.initData()->setNumberOfConstraints(numberOfConstraints);
+\textcolor{keywordflow}{if}(!solver.initData()->setHessianMatrix(hessian)) \textcolor{keywordflow}{return} 1;
+\textcolor{keywordflow}{if}(!solver.initData()->setGradient(gradient)) \textcolor{keywordflow}{return} 1;
+\textcolor{keywordflow}{if}(!solver.initData()->setLinearConstraintMatrix(linearMatrix)) \textcolor{keywordflow}{return} 1;
+\textcolor{keywordflow}{if}(!solver.initData()->setLowerBound(lowerBound)) \textcolor{keywordflow}{return} 1;
+\textcolor{keywordflow}{if}(!solver.initData()->setUpperBound(upperBound)) \textcolor{keywordflow}{return} 1;
+\end{DoxyCode}
+ The setter functions return {\ttfamily True} in case of success and {\ttfamily False} otherwise.
+
+Now you are able to initialize the solver. All data and settings will be stored inside the osqp struct and the optimization problem will be initialized. 
+\begin{DoxyCode}
+\textcolor{keywordflow}{if}(!solver.initSolver()) \textcolor{keywordflow}{return} 1;
+\end{DoxyCode}
+
+
+The optimization problem can be solved calling the following method 
+\begin{DoxyCode}
+\textcolor{keywordflow}{if}(!solver.solve()) \textcolor{keywordflow}{return} 1;
+\end{DoxyCode}
+ and the solution can be easily got by calling the following method 
+\begin{DoxyCode}
+Eigen::VectorXd QPSolution = optimizer.getSolution();
+\end{DoxyCode}
+
+
+If you need to update the bounds constraints and the gradient vector you can use the following methods\+:
+\begin{DoxyItemize}
+\item {\ttfamily \hyperlink{classOsqpEigen_1_1Solver_a1af39f37500a6bad6896e8e6699880fa}{Osqp\+Eigen\+::\+Solver\+::update\+Bounds}} to update both upper and lower bounds;
+\item {\ttfamily \hyperlink{classOsqpEigen_1_1Solver_a48764153cec5e618021ab79586cc71b6}{Osqp\+Eigen\+::\+Solver\+::update\+Lower\+Bound}} to update the lower bound;
+\item {\ttfamily \hyperlink{classOsqpEigen_1_1Solver_a69f1db45e10dae9c186cc0561532f018}{Osqp\+Eigen\+::\+Solver\+::update\+Upper\+Bound}} to update the upper bound;
+\item {\ttfamily \hyperlink{classOsqpEigen_1_1Solver_a7d1d9fdd8db3201a0ca2dcafbc289eea}{Osqp\+Eigen\+::\+Solver\+::update\+Gradient}} to update the gradient vector.
+\end{DoxyItemize}\hypertarget{index_results}{}\subsection{Example}\label{index_results}
+In the following the example of M\+PC controller is shown. 
+\begin{DoxyCodeInclude}
+
+\textcolor{comment}{// osqp-eigen}
+\textcolor{preprocessor}{#include "OsqpEigen/OsqpEigen.h"}
+
+\textcolor{comment}{// eigen}
+\textcolor{preprocessor}{#include <Eigen/Dense>}
+
+\textcolor{preprocessor}{#include <iostream>}
+
+\textcolor{keywordtype}{void} setDynamicsMatrices(Eigen::Matrix<double, 12, 12> &a, Eigen::Matrix<double, 12, 4> &b)
+\{
+    a << 1.,      0.,     0., 0., 0., 0., 0.1,     0.,     0.,  0.,     0.,     0.    ,
+        0.,      1.,     0., 0., 0., 0., 0.,      0.1,    0.,  0.,     0.,     0.    ,
+        0.,      0.,     1., 0., 0., 0., 0.,      0.,     0.1, 0.,     0.,     0.    ,
+        0.0488,  0.,     0., 1., 0., 0., 0.0016,  0.,     0.,  0.0992, 0.,     0.    ,
+        0.,     -0.0488, 0., 0., 1., 0., 0.,     -0.0016, 0.,  0.,     0.0992, 0.    ,
+        0.,      0.,     0., 0., 0., 1., 0.,      0.,     0.,  0.,     0.,     0.0992,
+        0.,      0.,     0., 0., 0., 0., 1.,      0.,     0.,  0.,     0.,     0.    ,
+        0.,      0.,     0., 0., 0., 0., 0.,      1.,     0.,  0.,     0.,     0.    ,
+        0.,      0.,     0., 0., 0., 0., 0.,      0.,     1.,  0.,     0.,     0.    ,
+        0.9734,  0.,     0., 0., 0., 0., 0.0488,  0.,     0.,  0.9846, 0.,     0.    ,
+        0.,     -0.9734, 0., 0., 0., 0., 0.,     -0.0488, 0.,  0.,     0.9846, 0.    ,
+        0.,      0.,     0., 0., 0., 0., 0.,      0.,     0.,  0.,     0.,     0.9846;
+
+    b << 0.,      -0.0726,  0.,     0.0726,
+        -0.0726,  0.,      0.0726, 0.    ,
+        -0.0152,  0.0152, -0.0152, 0.0152,
+        -0.,     -0.0006, -0.,     0.0006,
+        0.0006,   0.,     -0.0006, 0.0000,
+        0.0106,   0.0106,  0.0106, 0.0106,
+        0,       -1.4512,  0.,     1.4512,
+        -1.4512,  0.,      1.4512, 0.    ,
+        -0.3049,  0.3049, -0.3049, 0.3049,
+        -0.,     -0.0236,  0.,     0.0236,
+        0.0236,   0.,     -0.0236, 0.    ,
+        0.2107,   0.2107,  0.2107, 0.2107;
+\}
+
+
+\textcolor{keywordtype}{void} setInequalityConstraints(Eigen::Matrix<double, 12, 1> &xMax, Eigen::Matrix<double, 12, 1> &xMin,
+                              Eigen::Matrix<double, 4, 1> &uMax, Eigen::Matrix<double, 4, 1> &uMin)
+\{
+    \textcolor{keywordtype}{double} u0 = 10.5916;
+
+    \textcolor{comment}{// input inequality constraints}
+    uMin << 9.6 - u0,
+        9.6 - u0,
+        9.6 - u0,
+        9.6 - u0;
+
+    uMax << 13 - u0,
+        13 - u0,
+        13 - u0,
+        13 - u0;
+
+    \textcolor{comment}{// state inequality constraints}
+    xMin << -M\_PI/6,-M\_PI/6,-OSQPWrapper::INFINTY,-OSQPWrapper::INFINTY,-OSQPWrapper::INFINTY,-1.,
+        -OSQPWrapper::INFINTY, -OSQPWrapper::INFINTY,-OSQPWrapper::INFINTY,-OSQPWrapper::INFINTY,
+        -OSQPWrapper::INFINTY,-OSQPWrapper::INFINTY;
+
+    xMax << M\_PI/6,M\_PI/6, OSQPWrapper::INFINTY,OSQPWrapper::INFINTY,OSQPWrapper::INFINTY,
+        OSQPWrapper::INFINTY, OSQPWrapper::INFINTY,OSQPWrapper::INFINTY,OSQPWrapper::INFINTY,
+        OSQPWrapper::INFINTY,OSQPWrapper::INFINTY,OSQPWrapper::INFINTY;
+\}
+
+\textcolor{keywordtype}{void} setWeightMatrices(Eigen::DiagonalMatrix<double, 12> &Q, Eigen::DiagonalMatrix<double, 4> &R)
+\{
+    Q.diagonal() << 0, 0, 10., 10., 10., 10., 0, 0, 0, 5., 5., 5.;
+    R.diagonal() << 0.1, 0.1, 0.1, 0.1;
+\}
+
+\textcolor{keywordtype}{void} castMPCToQPHessian(\textcolor{keyword}{const} Eigen::DiagonalMatrix<double, 12> &Q, \textcolor{keyword}{const} Eigen::DiagonalMatrix<double, 4> 
+      &R, \textcolor{keywordtype}{int} mpcWindow,
+                        Eigen::SparseMatrix<double> &hessianMatrix)
+\{
+
+    hessianMatrix.resize(12*(mpcWindow+1) + 4 * mpcWindow, 12*(mpcWindow+1) + 4 * mpcWindow);
+
+    \textcolor{comment}{//populate hessian matrix}
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<12*(mpcWindow+1) + 4 * mpcWindow; i++)\{
+        \textcolor{keywordflow}{if}(i < 12*(mpcWindow+1))\{
+            \textcolor{keywordtype}{int} posQ=i%12;
+            \textcolor{keywordtype}{float} value = Q.diagonal()[posQ];
+            \textcolor{keywordflow}{if}(value != 0)
+                hessianMatrix.insert(i,i) = value;
+        \}
+        \textcolor{keywordflow}{else}\{
+            \textcolor{keywordtype}{int} posR=i%4;
+            \textcolor{keywordtype}{float} value = R.diagonal()[posR];
+            \textcolor{keywordflow}{if}(value != 0)
+                hessianMatrix.insert(i,i) = value;
+        \}
+    \}
+\}
+
+\textcolor{keywordtype}{void} castMPCToQPGradient(\textcolor{keyword}{const} Eigen::DiagonalMatrix<double, 12> &Q, \textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &
+      xRef, \textcolor{keywordtype}{int} mpcWindow,
+                         Eigen::VectorXd &gradient)
+\{
+
+    Eigen::Matrix<double,12,1> Qx\_ref;
+    Qx\_ref = Q * (-xRef);
+
+    \textcolor{comment}{// populate the gradient vector}
+    gradient = Eigen::VectorXd::Zero(12*(mpcWindow+1) +  4*mpcWindow, 1);
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<12*(mpcWindow+1); i++)\{
+        \textcolor{keywordtype}{int} posQ=i%12;
+        \textcolor{keywordtype}{float} value = Qx\_ref(posQ,0);
+        gradient(i,0) = value;
+    \}
+\}
+
+\textcolor{keywordtype}{void} castMPCToQPConstraintMatrix(\textcolor{keyword}{const} Eigen::Matrix<double, 12, 12> &dynamicMatrix, \textcolor{keyword}{const} 
+      Eigen::Matrix<double, 12, 4> &controlMatrix,
+                                 \textcolor{keywordtype}{int} mpcWindow, Eigen::SparseMatrix<double> &constraintMatrix)
+\{
+    constraintMatrix.resize(12*(mpcWindow+1)  + 12*(mpcWindow+1) + 4 * mpcWindow, 12*(mpcWindow+1) + 4 * 
+      mpcWindow);
+
+    \textcolor{comment}{// populate linear constraint matrix}
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<12*(mpcWindow+1); i++)\{
+        constraintMatrix.insert(i,i) = -1;
+    \}
+
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < mpcWindow; i++)
+        \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j = 0; j<12; j++)
+            \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k = 0; k<12; k++)\{
+                \textcolor{keywordtype}{float} value = dynamicMatrix(j,k);
+                \textcolor{keywordflow}{if}(value != 0)\{
+                    constraintMatrix.insert(12 * (i+1) + j, 12 * i + k) = value;
+                \}
+            \}
+
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < mpcWindow; i++)
+        \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j = 0; j < 12; j++)
+            \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k = 0; k < 4; k++)\{
+                \textcolor{keywordtype}{float} value = controlMatrix(j,k);
+                \textcolor{keywordflow}{if}(value != 0)\{
+                    constraintMatrix.insert(12*(i+1)+j, 4*i+k+12*(mpcWindow + 1)) = value;
+                \}
+            \}
+
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<12*(mpcWindow+1) + 4*mpcWindow; i++)\{
+        constraintMatrix.insert(i+(mpcWindow+1)*12,i) = 1;
+    \}
+\}
+
+\textcolor{keywordtype}{void} castMPCToQPConstraintVectors(\textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &xMax, \textcolor{keyword}{const} Eigen::Matrix<double, 12,
+       1> &xMin,
+                                   \textcolor{keyword}{const} Eigen::Matrix<double, 4, 1> &uMax, \textcolor{keyword}{const} Eigen::Matrix<double, 4,
+       1> &uMin,
+                                   \textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &x0,
+                                   \textcolor{keywordtype}{int} mpcWindow, Eigen::VectorXd &lowerBound, Eigen::VectorXd &upperBound)
+\{
+    \textcolor{comment}{// evaluate the lower and the upper inequality vectors}
+    Eigen::VectorXd lowerInequality = Eigen::MatrixXd::Zero(12*(mpcWindow+1) +  4 * mpcWindow, 1);
+    Eigen::VectorXd upperInequality = Eigen::MatrixXd::Zero(12*(mpcWindow+1) +  4 * mpcWindow, 1);
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<mpcWindow+1; i++)\{
+        lowerInequality.block(12*i,0,12,1) = xMin;
+        upperInequality.block(12*i,0,12,1) = xMax;
+    \}
+    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<mpcWindow; i++)\{
+        lowerInequality.block(4 * i + 12 * (mpcWindow + 1), 0, 4, 1) = uMin;
+        upperInequality.block(4 * i + 12 * (mpcWindow + 1), 0, 4, 1) = uMax;
+    \}
+
+    \textcolor{comment}{// evaluate the lower and the upper equality vectors}
+    Eigen::VectorXd lowerEquality = Eigen::MatrixXd::Zero(12*(mpcWindow+1),1 );
+    Eigen::VectorXd upperEquality;
+    lowerEquality.block(0,0,12,1) = -x0;
+    upperEquality = lowerEquality;
+    lowerEquality = lowerEquality;
+
+    \textcolor{comment}{// merge inequality and equality vectors}
+    lowerBound = Eigen::MatrixXd::Zero(2*12*(mpcWindow+1) +  4*mpcWindow,1 );
+    lowerBound << lowerEquality,
+        lowerInequality;
+
+    upperBound = Eigen::MatrixXd::Zero(2*12*(mpcWindow+1) +  4*mpcWindow,1 );
+    upperBound << upperEquality,
+        upperInequality;
+\}
+
+
+\textcolor{keywordtype}{void} updateConstraintVectors(\textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &x0,
+                             Eigen::VectorXd &lowerBound, Eigen::VectorXd &upperBound)
+\{
+    lowerBound.block(0,0,12,1) = -x0;
+    upperBound.block(0,0,12,1) = -x0;
+\}
+
+
+\textcolor{keywordtype}{double} getErrorNorm(\textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &x,
+                    \textcolor{keyword}{const} Eigen::Matrix<double, 12, 1> &xRef)
+\{
+    \textcolor{comment}{// evaluate the error}
+    Eigen::Matrix<double, 12, 1> error = x - xRef;
+
+    \textcolor{comment}{// return the norm}
+    \textcolor{keywordflow}{return} error.norm();
+\}
+
+
+\textcolor{keywordtype}{int} main()
+\{
+    \textcolor{comment}{// set the preview window}
+    \textcolor{keywordtype}{int} mpcWindow = 20;
+
+    \textcolor{comment}{// allocate the dynamics matrices}
+    Eigen::Matrix<double, 12, 12> a;
+    Eigen::Matrix<double, 12, 4> b;
+
+    \textcolor{comment}{// allocate the constraints vector}
+    Eigen::Matrix<double, 12, 1> xMax;
+    Eigen::Matrix<double, 12, 1> xMin;
+    Eigen::Matrix<double, 4, 1> uMax;
+    Eigen::Matrix<double, 4, 1> uMin;
+
+    \textcolor{comment}{// allocate the weight matrices}
+    Eigen::DiagonalMatrix<double, 12> Q;
+    Eigen::DiagonalMatrix<double, 4> R;
+
+    \textcolor{comment}{// allocate the initial and the reference state space}
+    Eigen::Matrix<double, 12, 1> x0;
+    Eigen::Matrix<double, 12, 1> xRef;
+
+    \textcolor{comment}{// allocate QP problem matrices and vectores}
+    Eigen::SparseMatrix<double> hessian;
+    Eigen::VectorXd gradient;
+    Eigen::SparseMatrix<double> linearMatrix;
+    Eigen::VectorXd lowerBound;
+    Eigen::VectorXd upperBound;
+
+    \textcolor{comment}{// set the initial and the desired states}
+    x0 << 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ;
+    xRef <<  0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+
+    \textcolor{comment}{// set MPC problem quantities}
+    setDynamicsMatrices(a, b);
+    setInequalityConstraints(xMax, xMin, uMax, uMin);
+    setWeightMatrices(Q, R);
+
+    \textcolor{comment}{// cast the MPC problem as QP problem}
+    castMPCToQPHessian(Q, R, mpcWindow, hessian);
+    castMPCToQPGradient(Q, xRef, mpcWindow, gradient);
+    castMPCToQPConstraintMatrix(a, b, mpcWindow, linearMatrix);
+    castMPCToQPConstraintVectors(xMax, xMin, uMax, uMin, x0, mpcWindow, lowerBound, upperBound);
+
+    \textcolor{comment}{// instantiate the solver}
+    OSQPWrapper::OptimizatorSolver solver;
+
+    \textcolor{comment}{// settings}
+    \textcolor{comment}{//solver.settings()->setVerbosity(false);}
+    solver.settings()->setWarmStart(\textcolor{keyword}{true});
+
+    \textcolor{comment}{// set the initial data of the QP solver}
+    solver.initData()->setNumberOfVariables(12 * (mpcWindow + 1) + 4 * mpcWindow);
+    solver.initData()->setNumberOfConstraints(2 * 12 * (mpcWindow + 1) +  4 * mpcWindow);
+    \textcolor{keywordflow}{if}(!solver.initData()->setHessianMatrix(hessian)) \textcolor{keywordflow}{return} 1;
+    \textcolor{keywordflow}{if}(!solver.initData()->setGradient(gradient)) \textcolor{keywordflow}{return} 1;
+    \textcolor{keywordflow}{if}(!solver.initData()->setLinearConstraintsMatrix(linearMatrix)) \textcolor{keywordflow}{return} 1;
+    \textcolor{keywordflow}{if}(!solver.initData()->setLowerBound(lowerBound)) \textcolor{keywordflow}{return} 1;
+    \textcolor{keywordflow}{if}(!solver.initData()->setUpperBound(upperBound)) \textcolor{keywordflow}{return} 1;
+
+    \textcolor{comment}{// instantiate the solver}
+    \textcolor{keywordflow}{if}(!solver.initSolver()) \textcolor{keywordflow}{return} 1;
+
+    \textcolor{comment}{// controller input and QPSolution vector}
+    Eigen::Vector4d ctr;
+    Eigen::VectorXd QPSolution;
+
+    \textcolor{comment}{// number of iteration steps}
+    \textcolor{keywordtype}{int} numberOfSteps = 50;
+
+    \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < numberOfSteps; i++)\{
+
+        \textcolor{comment}{// solve the QP problem}
+        \textcolor{keywordflow}{if}(!solver.solve()) \textcolor{keywordflow}{return} 1;
+
+        \textcolor{comment}{// get the controller input}
+        QPSolution = solver.getSolution();
+        ctr = QPSolution.block(12 * (mpcWindow + 1), 0, 4, 1);
+
+        \textcolor{comment}{// save data into file}
+        \textcolor{keyword}{auto} x0Data = x0.data();
+
+        \textcolor{comment}{// propagate the model}
+        x0 = a * x0 + b * ctr;
+
+        \textcolor{comment}{// update the constraint bound}
+        updateConstraintVectors(x0, lowerBound, upperBound);
+        \textcolor{keywordflow}{if}(!solver.updateBounds(lowerBound, upperBound)) \textcolor{keywordflow}{return} 1;
+      \}
+    \textcolor{keywordflow}{return} 0;
+\}
+\end{DoxyCodeInclude}
+
+
+The example presented generates the following results  

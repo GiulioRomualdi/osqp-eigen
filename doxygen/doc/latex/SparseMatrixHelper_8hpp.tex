@@ -1,0 +1,36 @@
+\section{Sparse\+Matrix\+Helper.\+hpp File Reference}
+\label{SparseMatrixHelper_8hpp}\index{Sparse\+Matrix\+Helper.\+hpp@{Sparse\+Matrix\+Helper.\+hpp}}
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$Eigen/\+Sparse$>$}\\*
+{\ttfamily \#include $<$osqp.\+h$>$}\\*
+{\ttfamily \#include $<$Osqp\+Eigen/\+Sparse\+Matrix\+Helper.\+tpp$>$}\\*
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceOsqpEigen}{Osqp\+Eigen}
+\begin{DoxyCompactList}\small\item\em \hyperlink{namespaceOsqpEigen}{Osqp\+Eigen} namespace. \end{DoxyCompactList}\item 
+ \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper}{Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper}
+\begin{DoxyCompactList}\small\item\em \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper}{Sparse\+Matrix\+Helper} namespace is a namspace that contains helper function to handle osqp matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper_afd0b552419320e79e627e5d6c9e5715c}{Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::create\+Osqp\+Sparse\+Matrix} (const Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&eigen\+Sparse\+Matrix, csc $\ast$\&osqp\+Sparse\+Matrix)
+\begin{DoxyCompactList}\small\item\em Allocate an osqp\+Sparse\+Matrix struct. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper_aec1a2210ce843eda8e4000c81d886131}{Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::osqp\+Sparse\+Matrix\+To\+Eigen\+Sparse\+Matrix} (const csc $\ast$const \&osqp\+Sparse\+Matrix, Eigen\+::\+Sparse\+Matrix$<$ T $>$ \&eigen\+Sparse\+Matrix)
+\begin{DoxyCompactList}\small\item\em Convert an osqp sparse matrix into an eigen sparse matrix. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper_af45a1d77519f691542150e506b6dcdeb}{Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::osqp\+Sparse\+Matrix\+To\+Triplets} (const csc $\ast$const \&osqp\+Sparse\+Matrix, std\+::vector$<$ Eigen\+::\+Triplet$<$ T $>$$>$ \&triplet\+List)
+\begin{DoxyCompactList}\small\item\em Convert an osqp sparse matrix into a eigen triplet list. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Tin , typename Tout $>$ }\\bool \hyperlink{namespaceOsqpEigen_1_1SparseMatrixHelper_ad0dac7c63fc97d0ceddadd5145d9b5c6}{Osqp\+Eigen\+::\+Sparse\+Matrix\+Helper\+::eigen\+Sparse\+Matrix\+To\+Triplets} (const Eigen\+::\+Sparse\+Matrix$<$ Tin $>$ \&eigen\+Sparse\+Matrix, std\+::vector$<$ Eigen\+::\+Triplet$<$ Tout $>$$>$ \&triplet\+List)
+\begin{DoxyCompactList}\small\item\em Convert an eigen sparse matrix into a eigen triplet list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Giulio Romualdi 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+Released under the terms of the L\+G\+P\+Lv2.\+1 or later, see L\+G\+P\+L.\+T\+XT 
+\end{DoxyCopyright}
+\begin{DoxyDate}{Date}
+2018 
+\end{DoxyDate}
