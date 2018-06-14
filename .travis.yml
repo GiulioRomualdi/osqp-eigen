@@ -11,37 +11,37 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-6']
-      env: COMPILER='g++-6' BUILD_TYPE='Release'
+      env: COMPILER='g++-6' BUILD_TYPE='Release' TRAVIS_BUILD_DOCS='true'
 
     - os: linux
       compiler: gcc
       addons: *gcc6
-      env: COMPILER='g++-6' BUILD_TYPE='Debug'
+      env: COMPILER='g++-6' BUILD_TYPE='Debug' TRAVIS_BUILD_DOCS='false'
 
-      # Linux C++14 Clang builds
+    # Linux C++14 Clang builds
     - os: linux
       compiler: clang
       addons: &clang39
         apt:
           sources: ['llvm-toolchain-precise-3.9', 'ubuntu-toolchain-r-test']
           packages: ['clang-3.9', 'g++-6']
-      env: COMPILER='clang++-3.9' BUILD_TYPE='Release'
+      env: COMPILER='clang++-3.9' BUILD_TYPE='Release' TRAVIS_BUILD_DOCS='false'
 
     - os: linux
       compiler: clang
       addons: *clang39
-      env: COMPILER='clang++-3.9' BUILD_TYPE='Debug'
+      env: COMPILER='clang++-3.9' BUILD_TYPE='Debug' TRAVIS_BUILD_DOCS='false'
 
-      # OSX C++14 Clang Build
+    # OSX C++14 Clang Build
     - os: osx
       osx_image: xcode8.3
       compiler: clang
-      env: COMPILER='clang++' BUILD_TYPE='Debug'
+      env: COMPILER='clang++' BUILD_TYPE='Debug' TRAVIS_BUILD_DOCS='false'
 
     - os: osx
       osx_image: xcode8.3
       compiler: clang
-      env: COMPILER='clang++' BUILD_TYPE='Release'
+      env: COMPILER='clang++' BUILD_TYPE='Release' TRAVIS_BUILD_DOCS='false'
 
 install:
   - export CXX=${COMPILER}
@@ -122,5 +122,18 @@ script:
   - make
   - make test
 
+after_success:
+  # Generate the docs only if master, the travis_build_docs is true and we can use secure variables
+  - >-
+    if [[ "$TRAVIS_BRANCH" = "master" && -n "$TRAVIS_BUILD_DOCS" && "$TRAVIS_PULL_REQUEST" = "false" ]] ; then
+      cd $PROJECT_DIR_ABS
+      source .ci/setup-ssh.sh || travis_terminate 1
+      .ci/generateDocumentation.sh || travis_terminate 1
+    fi
+
 notifications:
-  email: false
+  email:
+    recipients:
+      - giulio.romualdi@gmail.com
+    on_success: never
+    on_failure: always
